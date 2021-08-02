@@ -1,6 +1,6 @@
 # Descriere - Coș de gunoi inteligent :wastebasket: 
 ```diff
-+ Vasilache Dana-Maria, 332 AA
++ Vasilache Dana-Maria
 ```
 ## Schemă electrică
 
