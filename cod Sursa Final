@@ -1,0 +1,74 @@
+#include <Servo.h>   //servo library
+Servo servo;     
+int trigPin = 2; // trigger a reading   
+int echoPin = 3;   // measure a distance
+long durata;
+long distanta;
+long medie;   
+long medie1[3];   //vector pentru a masura media distantei
+int speed = 0;
+
+void setup() {       
+    Serial.begin(9600);
+    servo.attach(7);  // pinul la care e conectat servomotorul
+    pinMode(trigPin, OUTPUT);  
+    pinMode(echoPin, INPUT);  
+    servo.write(0);         //inchidere capac 
+    delay(100);
+    servo.detach(); 
+} 
+
+void masurare() {  
+  digitalWrite(trigPin, LOW);
+  delayMicroseconds(7);
+  digitalWrite(trigPin, HIGH);
+  delayMicroseconds(15);
+  digitalWrite(trigPin, LOW);
+  pinMode(echoPin, INPUT);
+  durata = pulseIn(echoPin, HIGH);
+  distanta = (durata/2) / 29.1;    //obtinem distanta, conform data sheet: jumatate din durata, impartit la 29.1
+}
+
+//controlam viteza de miscare a servomotorului cu ajutorul functiei moveTo
+int pos =0;  //variable to store the servo position
+int pos1 = 0;  //variable to store the servo position
+int mapSpeed =0;
+
+void moveTo(int position, int speed){
+  mapSpeed = map(speed, 0, 30, 30, 0); //map(value, fromLow, fromHigh, toLow, toHigh)
+ 	 if(position > pos){
+    	for(pos = pos1; pos < position; pos++){ //rotatie initiala (pozitie initiala- finala)
+    	  servo.write(pos);
+     	  pos1 = pos;
+     	  delay(mapSpeed);
+   		 }
+  	}
+  	else{
+    	for(pos = pos1; pos >= position; pos--){ //rotatie finala(pozitie finala - initiala)
+      		servo.write(pos);// tell servo to go to position in variable ‘pos’
+      		pos1=pos;
+     		delay(mapSpeed);
+    	}
+  	}
+}
+
+void loop() {  
+  for (int i=0;i<3;i++) {  //distanta medie
+ 	 masurare();               
+ 	 medie1[i]=distanta;            
+   	delay(10);  // delay-ul dintre masurari
+  }
+  distanta= (medie1[0]+medie1[1]+medie1[2])/3;    
+  
+ 
+	if (distanta <= 100 && distanta >= 0)  { //distanta intre [0cm, 100cm]
+  		servo.attach(7); //pornim servo
+  		moveTo(180, 2);  //apelam functia moveTo pt rotatia initiala 
+ 		delay(4000); // asteptam 4 secunde(timpul in care capacul va sta deschis)
+ 		moveTo(0, 6); //apelam functia moveTo pt rotatia finala
+ 		delay(3000);
+ 		servo.detach(); //oprim servo  
+	}
+	Serial.print(distanta);
+}
+

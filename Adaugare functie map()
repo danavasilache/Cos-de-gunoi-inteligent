@@ -1,0 +1,65 @@
+#include <Servo.h>   //servo library
+Servo servo;     
+int trigPin = 2; // trigger a reading   
+int echoPin = 3;   // measure a distance
+long durata;
+long distanta;
+long medie;   
+long medie1[3];   //vector pentru a masura media distantei
+int speed = 0;
+
+void setup() {       
+    Serial.begin(9600);
+    servo.attach(7);  // pinul la care e conectat servomotorul
+    pinMode(trigPin, OUTPUT);  
+    pinMode(echoPin, INPUT);  
+    servo.write(0);         //inchidere capac 
+    delay(100);
+    servo.detach(); 
+} 
+
+void masurare() {  
+  digitalWrite(trigPin, LOW);
+  delayMicroseconds(7);
+  digitalWrite(trigPin, HIGH);
+  delayMicroseconds(15);
+  digitalWrite(trigPin, LOW);
+  pinMode(echoPin, INPUT);
+  durata = pulseIn(echoPin, HIGH);
+  distanta = (durata/2) / 29.1;    //obtinem distanta, conform data sheet: jumatate din durata, impartit la 29.1
+}
+
+
+int mapSpeed =0;
+
+
+  mapSpeed = map(speed, 0, 30, 30, 0); //map(value, fromLow, fromHigh, toLow, toHigh)
+
+ 	for (pos = 0; pos <= 180; pos += 1) { // goes from 0 degrees to 180 degrees
+    // in steps of 1 degree
+    myservo.write(pos);              // tell servo to go to position in variable 'pos'
+    delay(15);                       // waits 15ms for the servo to reach the position
+  }
+  for (pos = 180; pos >= 0; pos -= 1) { // goes from 180 degrees to 0 degrees
+    myservo.write(pos);              // tell servo to go to position in variable 'pos'
+    delay(15);                       // waits 15ms for the servo to reach the position
+  }
+
+
+void loop() {  
+  for (int i=0;i<3;i++) {  //distanta medie
+ 	 masurare();               
+ 	 medie1[i]=distanta;            
+   	delay(10);  // delay-ul dintre masurari
+  }
+  distanta= (medie1[0]+medie1[1]+medie1[2])/3;    
+  
+ 
+	if (distanta <= 100 && distanta >= 0)  { //distanta intre [0cm, 100cm]
+  		servo.attach(7); //pornim servo
+ 		delay(3000);
+ 		servo.detach(); //oprim servo  
+	}
+	Serial.print(distanta);
+}
+
