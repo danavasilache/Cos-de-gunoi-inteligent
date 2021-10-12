@@ -67,18 +67,18 @@ int mapSpeed =0;
 void moveTo(int position, int speed){
   mapSpeed = map(speed, 0, 30, 30, 0); //map(value, fromLow, fromHigh, toLow, toHigh)
  	 if(position > pos){
-    	for(pos = pos1; pos < position; pos++){ //rotatie initiala (pozitie initiala- finala)
-    	  servo.write(pos);
-     	  pos1 = pos;
-     	  delay(mapSpeed);
-   		 }
-  	}
+    		for(pos = pos1; pos < position; pos++){ //rotatie initiala (pozitie initiala- finala)
+    	  		 servo.write(pos);
+     			 pos1 = pos;
+     			 delay(mapSpeed);
+ 		}
+ 	 }
   	else{
-    	for(pos = pos1; pos >= position; pos--){ //rotatie finala(pozitie finala - initiala)
-      		servo.write(pos);// tell servo to go to position in variable ‘pos’
-      		pos1=pos;
-     		delay(mapSpeed);
-    	}
+    		for(pos = pos1; pos >= position; pos--){ //rotatie finala(pozitie finala - initiala)
+      			servo.write(pos);// tell servo to go to position in variable ‘pos’
+      			pos1=pos;
+     			delay(mapSpeed);
+    		}
   	}
 }
 
